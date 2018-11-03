@@ -37,10 +37,8 @@ class SignedDirectedGraph:
     # also use lil_matrix to support fancy indexing etc.
     self.A = sparse.lil_matrix((n, n))
 
-    for node in self.G.Nodes():
-      nodeId = node.GetId()
-      nodeNbrs = getNodeOutNbrs(self.G, nodeId)
-      self.A[[nodeId] * len(nodeNbrs), nodeNbrs] = [self.signMap[(nodeId, nbr)] for nbr in nodeNbrs]
+    for edge in self.G.Edges():
+      self.A[edge.GetSrcNId(), edge.GetDstNId()] = self.signMap[(edge.GetSrcNId(), edge.GetDstNId())]
 
   def positiveAdjacencyMatrix(self):
     return self.A.maximum(0)
