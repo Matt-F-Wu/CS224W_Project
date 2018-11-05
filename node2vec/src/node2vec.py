@@ -68,6 +68,9 @@ class Graph():
 				unnormalized_probs.append(G[dst][dst_nbr]['weight'])
 			else:
 				unnormalized_probs.append(G[dst][dst_nbr]['weight']/q)
+		for i in range(len(unnormalized_probs)):
+			unnormalized_probs[i] = abs(unnormalized_probs[i])
+			
 		norm_const = sum(unnormalized_probs)
 		normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
 
@@ -84,21 +87,24 @@ class Graph():
 
 		count = 0
 		for node in G.nodes():
-			print "=========node========== ", node.ID
+			# print "=========node========== "
 			# unnormalized_probs = [G[node][nbr]['weight'] for nbr in sorted(G.neighbors(node))]
 			unnormalized_probs = []
 			
 			for nbr in sorted(G.neighbors(node)):
 				count += 1
 				
-				print "count: ", count
-				print "weight: ", G[node][nbr]['weight']
-				unnormalized_probs.append(G[node][nbr]['weight'])
-
-
-			norm_const = sum(unnormalized_probs)
-			print "norm_const: ", norm_const
-			normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
+				# print "count: ", count
+				# print "weight: ", G[node][nbr]['weight']
+				unnormalized_probs.append(abs(G[node][nbr]['weight']))
+			
+			# print unnormalized_probs
+			normalized_probs = []
+			if unnormalized_probs:
+				norm_const = sum(unnormalized_probs)
+				# print "norm_const: ", norm_const
+				normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
+			
 			alias_nodes[node] = alias_setup(normalized_probs)
 
 		alias_edges = {}
