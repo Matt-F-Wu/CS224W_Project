@@ -1,64 +1,67 @@
+import networkx as nx
 from ExtendedGraphs import SignedDirectedGraph
 
 def getExampleGraph1():
-  G = SignedDirectedGraph()
+  DG = nx.DiGraph()
 
   for i in range(1, 9):
-    G.AddNode(i)
+    DG.add_node(i)
 
-  print type(G)
-
-  G.AddSignedEdge(1, 2, 1)
-  G.AddSignedEdge(2, 3, -1)
-  G.AddSignedEdge(3, 1, 1)
-  G.AddSignedEdge(2, 4, 1)
-  G.AddSignedEdge(3, 4, -1)
-  G.AddSignedEdge(4, 5, -1)
-  G.AddSignedEdge(5, 1, 1)
-  G.AddSignedEdge(5, 6, 1)
-  G.AddSignedEdge(6, 7, -1)
-  G.AddSignedEdge(6, 8, -1)
-  G.AddSignedEdge(7, 8, 1)
+  DG.add_edge(1, 2, weight=1)
+  DG.add_edge(2, 3, weight=-1)
+  DG.add_edge(3, 1, weight=1)
+  DG.add_edge(2, 4, weight=1)
+  DG.add_edge(3, 4, weight=-1)
+  DG.add_edge(4, 5, weight=-1)
+  DG.add_edge(5, 1, weight=1)
+  DG.add_edge(5, 6, weight=1)
+  DG.add_edge(6, 7, weight=-1)
+  DG.add_edge(6, 8, weight=-1)
+  DG.add_edge(7, 8, weight=1)
 
   # This call is necessary
-  G.computeAdjacencyMatrix()
+  G = SignedDirectedGraph(DG)
 
   return G
 
 def getExampleGraph2():
-  G = SignedDirectedGraph()
+  DG = nx.DiGraph()
 
   for i in range(1, 10):
-    G.AddNode(i)
+    DG.add_node(i)
 
-  G.AddSignedEdge(1, 2, 1)
-  G.AddSignedEdge(1, 4, 1)
-  G.AddSignedEdge(1, 8, 1)
-  G.AddSignedEdge(2, 4, -1)
-  G.AddSignedEdge(3, 4, -1)
-  G.AddSignedEdge(3, 5, 1)
-  G.AddSignedEdge(8, 5, -1)
-  G.AddSignedEdge(9, 8, 1)
-  G.AddSignedEdge(9, 6, -1)
-  G.AddSignedEdge(5, 6, 1)
-  G.AddSignedEdge(5, 7, 1)
-  G.AddSignedEdge(6, 7, -1)
+  DG.add_edge(1, 2, weight=1)
+  DG.add_edge(1, 4, weight=1)
+  DG.add_edge(1, 8, weight=1)
+  DG.add_edge(2, 4, weight=-1)
+  DG.add_edge(3, 4, weight=-1)
+  DG.add_edge(3, 5, weight=1)
+  DG.add_edge(8, 5, weight=-1)
+  DG.add_edge(9, 8, weight=1)
+  DG.add_edge(9, 6, weight=-1)
+  DG.add_edge(5, 6, weight=1)
+  DG.add_edge(5, 7, weight=1)
+  DG.add_edge(6, 7, weight=-1)
 
-  G.computeAdjacencyMatrix()
+  G = SignedDirectedGraph(DG)
 
   return G
 
 def getExampleGraph3():
-  G = SignedDirectedGraph()
+  DG = nx.DiGraph()
 
   for i in range(1, 6):
-    G.AddNode(i)
+    DG.add_node(i)
 
-  G.AddSignedEdge(1, 2, 1)
-  G.AddSignedEdge(2, 3, 1)
-  G.AddSignedEdge(3, 4, 1)
-  G.AddSignedEdge(4, 5, 1)
+  DG.add_edge(1, 2, weight=1)
+  DG.add_edge(2, 3, weight=1)
+  DG.add_edge(3, 4, weight=1)
+  DG.add_edge(4, 5, weight=1)
 
-  G.computeAdjacencyMatrix()
+  G = SignedDirectedGraph(DG)
 
   return G
+
+if __name__ == '__main__':
+  G = getExampleGraph2()
+  print G.node_order

@@ -23,6 +23,10 @@ def adjacencyMatrixBranchMultiply(prod, G, k, i, j, res):
 
 def longWalkFeature(G, k, i, j):
   res = []
+  # identify the index of node i and j in the adjacency matrix.
+  i = G.lookUpNodeIdxInA(i)
+  j = G.lookUpNodeIdxInA(j)
+
   # Trigger recursive call, this is very expensive.
   adjacencyMatrixBranchMultiply(None, G, k - 1, i, j, res)
 
