@@ -81,9 +81,23 @@ class Graph():
 		is_directed = self.is_directed
 
 		alias_nodes = {}
+
+		count = 0
 		for node in G.nodes():
-			unnormalized_probs = [G[node][nbr]['weight'] for nbr in sorted(G.neighbors(node))]
+			print "=========node========== ", node.ID
+			# unnormalized_probs = [G[node][nbr]['weight'] for nbr in sorted(G.neighbors(node))]
+			unnormalized_probs = []
+			
+			for nbr in sorted(G.neighbors(node)):
+				count += 1
+				
+				print "count: ", count
+				print "weight: ", G[node][nbr]['weight']
+				unnormalized_probs.append(G[node][nbr]['weight'])
+
+
 			norm_const = sum(unnormalized_probs)
+			print "norm_const: ", norm_const
 			normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
 			alias_nodes[node] = alias_setup(normalized_probs)
 
