@@ -89,7 +89,7 @@ class Graph():
 		norm_const = sum(unnormalized_probs)
 		normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
 
-		return Categorical(normalized_probs)
+		return normalized_probs and Categorical(normalized_probs)
 
 	def preprocess_transition_probs(self):
 		'''
@@ -112,7 +112,7 @@ class Graph():
 			
 			# alias_nodes[node] contains a sampler (using the alias method) of the
 			# randome walk probability distribution of all its neighbors, the probability list is sorted by the neighbor nodes.
-			alias_nodes[node] = Categorical(normalized_probs)
+			alias_nodes[node] = normalized_probs and Categorical(normalized_probs)
 
 		# spin up 4 threads
 		pool = ThreadPool(4)
