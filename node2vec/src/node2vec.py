@@ -2,8 +2,11 @@ import numpy as np
 import networkx as nx
 import random
 
+# Hao: enable multi-threading for performance speed up.
+from multiprocessing.dummy import Pool as ThreadPool
 # A performance arbitrary prob. distribution sampler using the alias method, # Reference here: http://cgi.cs.mcgill.ca/~enewel3/posts/alias-method/index.html
 from categorical import Categorical
+
 
 class Graph():
 	def __init__(self, nx_G, is_directed, p, q):
@@ -47,12 +50,17 @@ class Graph():
 		G = self.G
 		walks = []
 		nodes = list(G.nodes())
+		pool = ThreadPool(4) 
+
 		print ('Walk iteration:')
 		for walk_iter in range(num_walks):
 			print (str(walk_iter+1), '/', str(num_walks))
 			random.shuffle(nodes)
-			for node in nodes:
-				walks.append(self.node2vec_walk(walk_length=walk_length, start_node=node))
+			# Each walk is independently parallalizable, thus I will distribute
+			# the workload to 4 threads to speed up performance.
+			results = pool.map(
+					lambda node: self.node2vec_walk(
+							walk_length=walk_length, start_node=node), nodes)
 
 		return walks
 
@@ -91,8 +99,8 @@ class Graph():
 		is_directed = self.is_directed
 
 		alias_nodes = {}
-		for node in G.nodes():
-			
+
+		def assign_probablistic_sampler_per_node(node):
 			unnormalized_probs = []
 			norm_const = 0
 			for nbr in sorted(G.neighbors(node)):
@@ -106,16 +114,24 @@ class Graph():
 			# randome walk probability distribution of all its neighbors, the probability list is sorted by the neighbor nodes.
 			alias_nodes[node] = Categorical(normalized_probs)
 
+		# spin up 4 threads
+		pool = ThreadPool(4)
+		pool.map(assign_probablistic_sampler_per_node, G.nodes())
+
 		alias_edges = {}
 		triads = {}
 
 		if is_directed:
-			for edge in G.edges():
+			def assign_sampler_per_edge_dir(edge):
 				alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
+			
+			pool.map(
+					assign_sampler_per_edge_dir, G.edges())
 		else:
-			for edge in G.edges():
+			def assign_sampler_per_edge(edge):
 				alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
 				alias_edges[(edge[1], edge[0])] = self.get_alias_edge(edge[1], edge[0])
+			pool.map(assign_sampler_per_edge, G.edges())
 
 		self.alias_nodes = alias_nodes
 		self.alias_edges = alias_edges
