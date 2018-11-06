@@ -2,6 +2,8 @@ import numpy as np
 import networkx as nx
 import random
 
+# A performance arbitrary prob. distribution sampler using the alias method, # Reference here: http://cgi.cs.mcgill.ca/~enewel3/posts/alias-method/index.html
+from categorical import Categorical
 
 class Graph():
 	def __init__(self, nx_G, is_directed, p, q):
@@ -25,11 +27,13 @@ class Graph():
 			cur_nbrs = sorted(G.neighbors(cur))
 			if len(cur_nbrs) > 0:
 				if len(walk) == 1:
-					walk.append(cur_nbrs[alias_draw(alias_nodes[cur][0], alias_nodes[cur][1])])
+					# I just started the walk, have no other way to go than to move 
+					# deeper, namely DFS.
+					walk.append(cur_nbrs[alias_nodes[cur].sample()])
 				else:
+					# I can do BFS, DFS, or return to previous step.
 					prev = walk[-2]
-					next = cur_nbrs[alias_draw(alias_edges[(prev, cur)][0], 
-						alias_edges[(prev, cur)][1])]
+					next = cur_nbrs[alias_edges[(prev, cur)].sample()]
 					walk.append(next)
 			else:
 				break
@@ -63,10 +67,13 @@ class Graph():
 		unnormalized_probs = []
 		for dst_nbr in sorted(G.neighbors(dst)):
 			if dst_nbr == src:
+				# return to prev
 				unnormalized_probs.append(G[dst][dst_nbr]['weight']/p)
 			elif G.has_edge(dst_nbr, src):
+				# BFS
 				unnormalized_probs.append(G[dst][dst_nbr]['weight'])
 			else:
+				# DFS, go deeper
 				unnormalized_probs.append(G[dst][dst_nbr]['weight']/q)
 		for i in range(len(unnormalized_probs)):
 			unnormalized_probs[i] = abs(unnormalized_probs[i])
@@ -74,7 +81,7 @@ class Graph():
 		norm_const = sum(unnormalized_probs)
 		normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
 
-		return alias_setup(normalized_probs)
+		return Categorical(normalized_probs)
 
 	def preprocess_transition_probs(self):
 		'''
@@ -84,28 +91,20 @@ class Graph():
 		is_directed = self.is_directed
 
 		alias_nodes = {}
-
-		count = 0
 		for node in G.nodes():
-			# print "=========node========== "
-			# unnormalized_probs = [G[node][nbr]['weight'] for nbr in sorted(G.neighbors(node))]
+			
 			unnormalized_probs = []
-			
+			norm_const = 0
 			for nbr in sorted(G.neighbors(node)):
-				count += 1
-				
-				# print "count: ", count
-				# print "weight: ", G[node][nbr]['weight']
-				unnormalized_probs.append(abs(G[node][nbr]['weight']))
+				abs_prob = abs(G[node][nbr]['weight'])
+				unnormalized_probs.append(abs_prob)
+				norm_const += abs_prob
 			
-			# print unnormalized_probs
-			normalized_probs = []
-			if unnormalized_probs:
-				norm_const = sum(unnormalized_probs)
-				# print "norm_const: ", norm_const
-				normalized_probs =  [float(u_prob)/norm_const for u_prob in unnormalized_probs]
+			normalized_probs = [float(u_prob)/norm_const for u_prob in unnormalized_probs]
 			
-			alias_nodes[node] = alias_setup(normalized_probs)
+			# alias_nodes[node] contains a sampler (using the alias method) of the
+			# randome walk probability distribution of all its neighbors, the probability list is sorted by the neighbor nodes.
+			alias_nodes[node] = Categorical(normalized_probs)
 
 		alias_edges = {}
 		triads = {}
@@ -122,48 +121,3 @@ class Graph():
 		self.alias_edges = alias_edges
 
 		return
-
-
-def alias_setup(probs):
-	'''
-	Compute utility lists for non-uniform sampling from discrete distributions.
-	Refer to https://hips.seas.harvard.edu/blog/2013/03/03/the-alias-method-efficient-sampling-with-many-discrete-outcomes/
-	for details
-	'''
-	K = len(probs)
-	q = np.zeros(K)
-	J = np.zeros(K, dtype=np.int)
-
-	smaller = []
-	larger = []
-	for kk, prob in enumerate(probs):
-	    q[kk] = K*prob
-	    if q[kk] < 1.0:
-	        smaller.append(kk)
-	    else:
-	        larger.append(kk)
-
-	while len(smaller) > 0 and len(larger) > 0:
-	    small = smaller.pop()
-	    large = larger.pop()
-
-	    J[small] = large
-	    q[large] = q[large] + q[small] - 1.0
-	    if q[large] < 1.0:
-	        smaller.append(large)
-	    else:
-	        larger.append(large)
-
-	return J, q
-
-def alias_draw(J, q):
-	'''
-	Draw sample from a non-uniform discrete distribution using alias sampling.
-	'''
-	K = len(J)
-
-	kk = int(np.floor(np.random.rand()*K))
-	if np.random.rand() < q[kk]:
-	    return kk
-	else:
-	    return J[kk]
