@@ -15,6 +15,19 @@ import networkx as nx
 import node2vec
 from gensim.models import Word2Vec
 
+def getExampleGraph3():
+  DG = nx.DiGraph()
+
+  for i in range(1, 6):
+    DG.add_node(i)
+
+  DG.add_edge(1, 2, weight=1)
+  DG.add_edge(2, 3, weight=1)
+  DG.add_edge(3, 4, weight=1)
+  DG.add_edge(4, 5, weight=1)
+
+  return DG
+
 def parse_args():
 	'''
 	Parses the node2vec arguments.
@@ -97,6 +110,7 @@ def main(args):
 	G = node2vec.Graph(nx_G, args.directed, args.p, args.q)
 	G.preprocess_transition_probs()
 	walks = G.simulate_walks(args.num_walks, args.walk_length)
+	print walks
 	learn_embeddings(walks)
 
 if __name__ == "__main__":

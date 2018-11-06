@@ -9,6 +9,9 @@ Created on Thu Nov  1 21:56:03 2018
 import networkx as nx
 from random import choice
 
+import highorder
+from ExtendedGraphs import SignedDirectedGraph
+
 # Degree type feature and lowOrder feature:
 def degreeFeature(graph, edge): # TUNGraphEdgeI
     # get source and destination node id for given edge in given graph
@@ -73,6 +76,11 @@ if __name__ == "__main__":
                                   create_using=nx.DiGraph(), encoding='utf-8')
     
     print degreeFeature(G, list(G.edges(data='weight'))[1])
+
+    # test high order feature extraction
+    highorder.longWalkFeatureAll(SignedDirectedGraph(G), [4, 5])
+
+    print '== Done =='
                                                              
     
     

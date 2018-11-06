@@ -7,9 +7,6 @@ from multiprocessing.dummy import Pool as ThreadPool
 # A performance arbitrary prob. distribution sampler using the alias method, # Reference here: http://cgi.cs.mcgill.ca/~enewel3/posts/alias-method/index.html
 from categorical import Categorical
 
-# defines the number of worker processes we want to use.
-NUM_THREAD = 8
-
 
 class Graph():
 	def __init__(self, nx_G, is_directed, p, q):
@@ -53,7 +50,7 @@ class Graph():
 		G = self.G
 		walks = []
 		nodes = list(G.nodes())
-		pool = ThreadPool(NUM_THREAD) 
+		pool = ThreadPool(8) 
 
 		print ('Walk iteration:')
 		for walk_iter in range(num_walks):
@@ -62,8 +59,8 @@ class Graph():
 			# Each walk is independently parallalizable, thus I will distribute
 			# the workload to 4 threads to speed up performance.
 			results = pool.map(
-					lambda node: self.node2vec_walk(
-							walk_length=walk_length, start_node=node), nodes)
+					lambda node: walks.append(self.node2vec_walk(
+							walk_length=walk_length, start_node=node)), nodes)
 
 		return walks
 
@@ -118,7 +115,7 @@ class Graph():
 			alias_nodes[node] = normalized_probs and Categorical(normalized_probs)
 
 		# spin up 4 threads
-		pool = ThreadPool(NUM_THREAD)
+		pool = ThreadPool(8)
 		pool.map(assign_probablistic_sampler_per_node, G.nodes())
 
 		alias_edges = {}
