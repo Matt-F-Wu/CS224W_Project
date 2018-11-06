@@ -8,7 +8,7 @@ node2vec: Scalable Feature Learning for Networks
 Aditya Grover and Jure Leskovec 
 Knowledge Discovery and Data Mining (KDD), 2016
 '''
-
+import time
 import argparse
 import numpy as np
 import networkx as nx
@@ -101,4 +101,8 @@ def main(args):
 
 if __name__ == "__main__":
 	args = parse_args()
+	start = time.time()
 	main(args)
+	end = time.time()
+
+	print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
