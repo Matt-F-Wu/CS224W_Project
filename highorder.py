@@ -153,10 +153,13 @@ class HighOrderFeatureExtractor(object):
 
 if __name__ == '__main__':  
   # Test computation and saving object
-  # G3 = examples.getExampleGraph3()
-  # longWalkFeatureWriteAll(G3, [4, 5], 'G3')
+  G3 = examples.getExampleGraph3()
+  longWalkFeatureWriteAll(G3, [4, 5], 'G3')
   
   # Test loading object
   h_extractor = HighOrderFeatureExtractor('G3', [4, 5])
   res3 = h_extractor.getEdgeFeatures((1, 2))
-  print sum(res3[4][0])
+  print sum(res3[4][0]) # expects 2.0
+
+  res3_1 = h_extractor.getEdgeFeatures((2, 3))
+  print sum(res3_1[4][0]) # expects 3.0

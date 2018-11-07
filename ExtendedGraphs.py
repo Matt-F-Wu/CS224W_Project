@@ -13,6 +13,9 @@ class SignedDirectedGraph:
     for idx, node in enumerate(self.node_order):
       self.node_index[node] = idx
 
+    self.APos = self.A.maximum(0)
+    self.ANeg = self.A.minimum(0).multiply(-1)
+
   # Because the matrix is not indexed with node ID, so we need to
   # have this function to look up which position a node is actually
   # at in the matrix
@@ -20,9 +23,9 @@ class SignedDirectedGraph:
     return self.node_index[n]
 
   def positiveAdjacencyMatrix(self):
-    return self.A.maximum(0)
+    return self.APos
 
   def negativeAdjacencyMatrix(self):
     # obtain the negative enties of the matrix, and make them positive
-    return self.A.minimum(0).multiply(-1)
+    return self.ANeg
 
