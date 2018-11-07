@@ -15,6 +15,8 @@ class SignedDirectedGraph:
 
     self.APos = self.A.maximum(0)
     self.ANeg = self.A.minimum(0).multiply(-1)
+    self.APosT = self.APos.transpose()
+    self.ANegT = self.ANeg.transpose()
 
   # Because the matrix is not indexed with node ID, so we need to
   # have this function to look up which position a node is actually
@@ -28,4 +30,7 @@ class SignedDirectedGraph:
   def negativeAdjacencyMatrix(self):
     # obtain the negative enties of the matrix, and make them positive
     return self.ANeg
+
+  def adjPermutations(self):
+    return [self.APos, self.APosT, self.ANeg, self.ANegT]
 

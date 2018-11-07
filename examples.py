@@ -45,13 +45,13 @@ def getExampleGraph2():
 def getExampleGraph3():
   DG = nx.DiGraph()
 
-  for i in range(1, 6):
+  for i in range(1, 60):
     DG.add_node(i)
 
-  DG.add_edge(1, 2, weight=1)
-  DG.add_edge(2, 3, weight=1)
-  DG.add_edge(3, 4, weight=1)
-  DG.add_edge(4, 5, weight=1)
+  w = 1
+  for i in range(1, 59):
+    w *= -1 
+    DG.add_edge(i, i+1, weight=w)
 
   return DG
 

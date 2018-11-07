@@ -5,12 +5,15 @@ import uuid
 import numpy as np
 from scipy import sparse
 from collections import defaultdict
+from multiprocessing.dummy import Pool as ThreadPool
 
 import examples
 from ExtendedGraphs import SignedDirectedGraph
 
 # This file contains method used to extract long cycle/walk features,
 # and other hight-order features
+
+NUM_BRANCHING_THREADS = 2
 
 def save_obj(obj, name):
   # print type(obj)
@@ -41,17 +44,14 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
       return
   
   if prod is None:
-    adjacencyMatrixBranchMultiply(G.positiveAdjacencyMatrix(), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(G.positiveAdjacencyMatrix().transpose(), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(G.negativeAdjacencyMatrix(), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(G.negativeAdjacencyMatrix().transpose(), G, k + 1, k_list, res, name)
+    pool = ThreadPool(NUM_BRANCHING_THREADS)
+    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
+    pool.close()
   else:
-    adjacencyMatrixBranchMultiply(prod.dot(G.positiveAdjacencyMatrix()), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(
-        prod.dot(G.positiveAdjacencyMatrix().transpose()), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(prod.dot(G.negativeAdjacencyMatrix()), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(
-        prod.dot(G.negativeAdjacencyMatrix().transpose()), G, k + 1, k_list, res, name)
+    pool = ThreadPool(NUM_BRANCHING_THREADS)
+    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
+    pool.close()
+
 
 def longWalkFeature(G, k_list, name):
   res = defaultdict(list)
@@ -154,7 +154,11 @@ class HighOrderFeatureExtractor(object):
 if __name__ == '__main__':  
   # Test computation and saving object
   G3 = examples.getExampleGraph3()
+  start = time.time()
   longWalkFeatureWriteAll(G3, [4, 5], 'G3')
+  end = time.time()
+
+  print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
   
   # Test loading object
   h_extractor = HighOrderFeatureExtractor('G3', [4, 5])
