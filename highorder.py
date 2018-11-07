@@ -13,6 +13,8 @@ from ExtendedGraphs import SignedDirectedGraph
 # This file contains method used to extract long cycle/walk features,
 # and other hight-order features
 
+# Hao: this particular threading configuration is chosen to optimize
+# performance on machines with #CPU > 8 and RAM >= 512GB.
 NUM_BRANCHING_THREADS = 4
 
 def save_obj(obj, name):
@@ -48,12 +50,9 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
     pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
     pool.close()
   else:
-    adjacencyMatrixBranchMultiply(prod.dot(G.APos), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(
-        prod.dot(G.APosT), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(prod.dot(G.ANeg), G, k + 1, k_list, res, name)
-    adjacencyMatrixBranchMultiply(
-        prod.dot(G.ANegT), G, k + 1, k_list, res, name)
+    pool = ThreadPool(NUM_BRANCHING_THREADS)
+    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
+    pool.close()
 
 def longWalkFeature(G, k_list, name):
   res = defaultdict(list)
@@ -129,8 +128,12 @@ class HighOrderFeatureExtractor(object):
       # get an array of src nodes, and an arry of dst nodes
       src, dst = zip(*edges)
     else:
-      # argument type is wrong
-      return None
+      # argument type might be numpy array
+      src = []
+      dst = []
+      for edge in edges:
+        src.append(edge[0])
+        dst.append(edge[1])
 
     # Get lists of mtx indices for src and dst nodes
     i = [node_index[s] for s in src]
@@ -155,17 +158,15 @@ class HighOrderFeatureExtractor(object):
 
 if __name__ == '__main__':  
   # Test computation and saving object
-  G3 = examples.getExampleGraph3()
-  start = time.time()
-  longWalkFeatureWriteAll(G3, [4, 5], 'G3')
-  end = time.time()
+  # G3 = examples.getExampleGraph3()
+  # start = time.time()
+  # longWalkFeatureWriteAll(G3, [4, 5], 'G3')
+  # end = time.time()
 
-  print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
+  # print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
   
   # Test loading object
   h_extractor = HighOrderFeatureExtractor('G3', [4, 5])
-  res3 = h_extractor.getEdgeFeatures((1, 2))
+  res3 = h_extractor.getEdgeFeatures([(1, 2), (2, 3)])
   print sum(res3[4][0]) # expects 2.0
-
-  res3_1 = h_extractor.getEdgeFeatures((2, 3))
-  print sum(res3_1[4][0]) # expects 3.0
+  print sum(res3[4][1]) # expects 3.0
