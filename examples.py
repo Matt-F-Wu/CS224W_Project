@@ -19,10 +19,7 @@ def getExampleGraph1():
   DG.add_edge(6, 8, weight=-1)
   DG.add_edge(7, 8, weight=1)
 
-  # This call is necessary
-  G = SignedDirectedGraph(DG)
-
-  return G
+  return DG
 
 def getExampleGraph2():
   DG = nx.DiGraph()
@@ -43,9 +40,7 @@ def getExampleGraph2():
   DG.add_edge(5, 7, weight=1)
   DG.add_edge(6, 7, weight=-1)
 
-  G = SignedDirectedGraph(DG)
-
-  return G
+  return DG
 
 def getExampleGraph3():
   DG = nx.DiGraph()
@@ -58,10 +53,7 @@ def getExampleGraph3():
   DG.add_edge(3, 4, weight=1)
   DG.add_edge(4, 5, weight=1)
 
-  G = SignedDirectedGraph(DG)
-
-  return G
+  return DG
 
 if __name__ == '__main__':
   G = getExampleGraph2()
-  print G.node_order

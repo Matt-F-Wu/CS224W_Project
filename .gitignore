@@ -1,0 +1,3 @@
+obj/
+*.pyc
+node2vec/src/*.pyc

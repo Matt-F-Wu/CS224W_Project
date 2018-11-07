@@ -1,5 +1,4 @@
 from networkx.linalg import attrmatrix
-from scipy import sparse
 
 # Defines a class for a signed/weighted directed graph.
 # Note: please use this class for all the graphs in this project.
@@ -9,12 +8,16 @@ class SignedDirectedGraph:
     self.G = graph
     self.A, self.node_order = attrmatrix.attr_sparse_matrix(
         graph, edge_attr='weight')
+    self.node_index = {}
+
+    for idx, node in enumerate(self.node_order):
+      self.node_index[node] = idx
 
   # Because the matrix is not indexed with node ID, so we need to
   # have this function to look up which position a node is actually
   # at in the matrix
   def lookUpNodeIdxInA(self, n):
-    return self.node_order.index(n)
+    return self.node_index[n]
 
   def positiveAdjacencyMatrix(self):
     return self.A.maximum(0)

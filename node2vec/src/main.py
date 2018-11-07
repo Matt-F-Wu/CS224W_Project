@@ -110,7 +110,6 @@ def main(args):
 	G = node2vec.Graph(nx_G, args.directed, args.p, args.q)
 	G.preprocess_transition_probs()
 	walks = G.simulate_walks(args.num_walks, args.walk_length)
-	print walks
 	learn_embeddings(walks)
 
 if __name__ == "__main__":

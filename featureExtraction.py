@@ -5,12 +5,11 @@ Created on Thu Nov  1 21:56:03 2018
 
 @author: liguo
 """
-
 import networkx as nx
 from random import choice
 
 import highorder
-from ExtendedGraphs import SignedDirectedGraph
+
 
 # Degree type feature and lowOrder feature:
 def degreeFeature(graph, edge): # TUNGraphEdgeI
@@ -75,10 +74,10 @@ if __name__ == "__main__":
     G = nx.read_weighted_edgelist("soc-sign-epinions.txt", comments='#', 
                                   create_using=nx.DiGraph(), encoding='utf-8')
     
-    print degreeFeature(G, list(G.edges(data='weight'))[1])
+    # print degreeFeature(G, list(G.edges(data='weight'))[1])
 
-    # test high order feature extraction
-    highorder.longWalkFeatureAll(SignedDirectedGraph(G), [4, 5])
+    # test high order feature extraction, write to file
+    highorder.longWalkFeatureWriteAll(G, [4, 5], 'epinions')
 
     print '== Done =='
                                                              
