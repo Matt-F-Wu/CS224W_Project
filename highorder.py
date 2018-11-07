@@ -13,7 +13,7 @@ from ExtendedGraphs import SignedDirectedGraph
 # This file contains method used to extract long cycle/walk features,
 # and other hight-order features
 
-NUM_BRANCHING_THREADS = 2
+NUM_BRANCHING_THREADS = 4
 
 def save_obj(obj, name):
   # print type(obj)
@@ -48,10 +48,12 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
     pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
     pool.close()
   else:
-    pool = ThreadPool(NUM_BRANCHING_THREADS)
-    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
-    pool.close()
-
+    adjacencyMatrixBranchMultiply(prod.dot(G.APos), G, k + 1, k_list, res, name)
+    adjacencyMatrixBranchMultiply(
+        prod.dot(G.APosT), G, k + 1, k_list, res, name)
+    adjacencyMatrixBranchMultiply(prod.dot(G.ANeg), G, k + 1, k_list, res, name)
+    adjacencyMatrixBranchMultiply(
+        prod.dot(G.ANegT), G, k + 1, k_list, res, name)
 
 def longWalkFeature(G, k_list, name):
   res = defaultdict(list)
