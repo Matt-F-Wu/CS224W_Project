@@ -50,9 +50,18 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
     pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
     pool.close()
   else:
-    pool = ThreadPool(NUM_BRANCHING_THREADS)
-    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
-    pool.close()
+    if k > 3:
+      # stop making more threads
+      adjacencyMatrixBranchMultiply(prod.dot(G.APos), G, k + 1, k_list, res, name)
+      adjacencyMatrixBranchMultiply(
+          prod.dot(G.APosT), G, k + 1, k_list, res, name)
+      adjacencyMatrixBranchMultiply(prod.dot(G.ANeg), G, k + 1, k_list, res, name)
+      adjacencyMatrixBranchMultiply(
+          prod.dot(G.ANegT), G, k + 1, k_list, res, name)
+    else:
+      pool = ThreadPool(NUM_BRANCHING_THREADS)
+      pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
+      pool.close()
 
 def longWalkFeature(G, k_list, name):
   res = defaultdict(list)
