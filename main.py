@@ -21,10 +21,11 @@ import numpy as np
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score, accuracy_score
 from sklearn.model_selection import KFold
+from multiprocessing.dummy import Pool as ThreadPool
 
 import highorder
 from Node2vecExtractor import Node2vecExtractor
-import featureExtraction as fx
+from featureExtraction import LoDegFeatureExtractor
 from examples import getExampleGraph3
 
 
@@ -38,10 +39,12 @@ featureConfig = {
 
 configString = ''
 
+NUM_THREADS = 8
+
 # a global highorder feature extractor
 h_extractor = None
 n_extractor = None
-d_extractor = None
+ld_extractor = None
 
 
 def writeLog(dataset, logString):
@@ -94,7 +97,7 @@ def makeBatches(batch_index, batchSize):
 
 # TODO(guo li): please follow the implementation of load_highorder
 def load_degreetype(G, batch, X):
-  res = fx.getDegreeFeatures(G, batch)
+  res = ld_extractor.getDegreeFeatures(batch)
   # append features for every order, e.g 4, 5
   for i, row in enumerate(res):
     X[i].extend(row)
@@ -102,7 +105,7 @@ def load_degreetype(G, batch, X):
 
 # TODO(leo): please follow the implementation of load_highorder
 def load_loworder(G, batch, X):
-  res = fx.getLowOrderFeatures(G, batch)
+  res = ld_extractor.getLowOrderFeatures(batch)
   # append features for every order, e.g 4, 5
   for i, row in enumerate(res):
     X[i].extend(row)
@@ -127,7 +130,7 @@ def load_node2vec(dataset, batch, X):
 
 # TODO: make this configurable so we can have different combinations
 # of features.
-def loadFeatures(graph, dataset, batch):
+def loadFeaturesSmallerBatch(graph, dataset, minibatch):
   global featureConfig
 
   batchSize = len(batch)
@@ -146,6 +149,17 @@ def loadFeatures(graph, dataset, batch):
 
   return X
 
+def loadFeatures(graph, dataset, batch):
+  minibatches = []
+  minibatchSize = len(batch) / NUM_THREADS
+  for i in xrange(NUM_THREADS):
+    minibatches.append(batch[i*minibatchSize:(i+1)*minibatchSize])
+
+  pool = ThreadPool(NUM_THREADS)
+  results = pool.map(lambda mini: loadFeaturesSmallerBatch(graph, dataset, mini), minibatches)
+
+  return reduce(lambda x, y: x + y, results)
+
 
 def loadLabel(graph, batch):
   y = []
@@ -158,6 +172,10 @@ def loadLabel(graph, batch):
 def train(dataset, iters, batchSize):
   # load the graph and get all the edges as an numpy array
   graph, edges = loadGraph(dataset)
+
+  # build extractor only once.
+  if featureConfig['l'] or featureConfig['e']:
+    ld_extractor = LoDegFeatureExtractor(graph)
 
   os.makedirs('result/{}'.format(dataset))
   # logistic regression with l2 regularization
@@ -268,5 +286,6 @@ if __name__ == '__main__':
     h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
   if featureConfig['n']:
     n_extractor = Node2vecExtractor(dataset)
+
   
   train(dataset, iters, batchSize)

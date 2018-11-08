@@ -14,7 +14,7 @@ import highorder
 
 
 # Degree type feature and lowOrder feature:
-def degreeFeature(graph, srcNode, dstNode): # TUNGraphEdgeI
+def degreeFeature(graph, uGraph, srcNode, dstNode): # TUNGraphEdgeI
     # get source and destination node id for given edge in given graph
     #srcNode, dstNode, weight= edge
     weight = graph[srcNode][dstNode]['weight']
@@ -45,9 +45,6 @@ def degreeFeature(graph, srcNode, dstNode): # TUNGraphEdgeI
     featureList.append(totalIn_dst);
     # print "total in degree for start node", totalIn_dst
     
-    # change graph into undirected graph
-    uGraph = graph.to_undirected()
-    
     # number of common neighbors
     cmnNbrs = list(nx.common_neighbors(uGraph, srcNode, dstNode))
     cmnNbrNum = len(cmnNbrs)
@@ -73,9 +70,7 @@ def degreeFeature(graph, srcNode, dstNode): # TUNGraphEdgeI
 
             
 # Extract all triads types with given edge inside of them
-def lowOrderFeature(graph, srcNode, dstNode):
-    # change graph into undirected graph
-    uGraph = graph.to_undirected()
+def lowOrderFeature(graph, uGraph, srcNode, dstNode):
     
     # number of common neighbors
     cmnNbrs = list(nx.common_neighbors(uGraph, srcNode, dstNode))
@@ -137,72 +132,80 @@ def lowOrderFeature(graph, srcNode, dstNode):
         
     
 
+class LoDegFeatureExtractor:
+    def __init__(self, graph):
+        self.graph = graph
+        # change graph into undirected graph
+        # This operation is slow, so it should only be done once
+        self.uGraph = graph.to_undirected()
 
-# Get the degree level features for one or a list of edges
-# Arg:
-#  node_index: dictionary, key is node id and value is index in mtx.
-#  feature_store: dictionary, key is order number, valus is a list
-#  files storing various configurations of mtx representing various
-#  path configurations.
-#  edge: tuple or np array of tuples
-def getDegreeFeatures(graph, edges):
-    # The following 2 variables are intended to be lists
-    src = None
-    dst = None
-    if type(edges) is tuple:
-        src = [edges[0]]
-        dst = [edges[1]]
-    elif type(edges) is list:
-        # get an array of src nodes, and an arry of dst nodes
-        src, dst = zip(*edges)
-    else:
-        # argument type might be numpy array
-        src = []
-        dst = []
-        for edge in edges:
-            src.append(edge[0])
-            dst.append(edge[1])
-        
-    edgeFeatures = []
-    for i in range(len(src)):
-        feature = degreeFeature(graph, src[i], dst[i])
-        edgeFeatures.append(feature)
-    # print "degree level features: ", edgeFeatures
-    return edgeFeatures
+    # Get the degree level features for one or a list of edges
+    # Arg:
+    #  node_index: dictionary, key is node id and value is index in mtx.
+    #  feature_store: dictionary, key is order number, valus is a list
+    #  files storing various configurations of mtx representing various
+    #  path configurations.
+    #  edge: tuple or np array of tuples
+    def getDegreeFeatures(self, edges):
+        graph = self.graph
+        # The following 2 variables are intended to be lists
+        src = None
+        dst = None
+        if type(edges) is tuple:
+            src = [edges[0]]
+            dst = [edges[1]]
+        elif type(edges) is list:
+            # get an array of src nodes, and an arry of dst nodes
+            src, dst = zip(*edges)
+        else:
+            # argument type might be numpy array
+            src = []
+            dst = []
+            for edge in edges:
+                src.append(edge[0])
+                dst.append(edge[1])
+            
+        edgeFeatures = []
+        for i in range(len(src)):
+            feature = degreeFeature(graph, self.uGraph, src[i], dst[i])
+            edgeFeatures.append(feature)
+        # print "degree level features: ", edgeFeatures
+        return edgeFeatures
 
 
 
-# Get the low order features for one or a list of edges
-# Arg:
-#  node_index: dictionary, key is node id and value is index in mtx.
-#  feature_store: dictionary, key is order number, valus is a list
-#  files storing various configurations of mtx representing various
-#  path configurations.
-#  edge: tuple or np array of tuples
-def getLowOrderFeatures(graph, edges):
-    # The following 2 variables are intended to be lists
-    src = None
-    dst = None
-    if type(edges) is tuple:
-        src = [edges[0]]
-        dst = [edges[1]]
-    elif type(edges) is list:
-        # get an array of src nodes, and an arry of dst nodes
-        src, dst = zip(*edges)
-    else:
-        # argument type might be numpy array
-        src = []
-        dst = []
-        for edge in edges:
-            src.append(edge[0])
-            dst.append(edge[1])
-        
-    edgeFeatures = []
-    for i in range(len(src)):
-        feature = lowOrderFeature(graph, src[i], dst[i])
-        edgeFeatures.append(feature)
-    # print "Motif counts: ", edgeFeatures
-    return edgeFeatures
+    # Get the low order features for one or a list of edges
+    # Arg:
+    #  node_index: dictionary, key is node id and value is index in mtx.
+    #  feature_store: dictionary, key is order number, valus is a list
+    #  files storing various configurations of mtx representing various
+    #  path configurations.
+    #  edge: tuple or np array of tuples
+    def getLowOrderFeatures(self, edges):
+        graph = self.graph
+        # The following 2 variables are intended to be lists
+        src = None
+        dst = None
+        if type(edges) is tuple:
+            src = [edges[0]]
+            dst = [edges[1]]
+        elif type(edges) is list:
+            # get an array of src nodes, and an arry of dst nodes
+            src, dst = zip(*edges)
+        else:
+            # argument type might be numpy array
+            src = []
+            dst = []
+            for edge in edges:
+                src.append(edge[0])
+                dst.append(edge[1])
+            
+        edgeFeatures = []
+        for i in range(len(src)):
+            feature = lowOrderFeature(graph, self.uGraph, src[i], dst[i])
+            edgeFeatures.append(feature)
+        # print "Motif counts: ", edgeFeatures
+        return edgeFeatures
         
 
  
