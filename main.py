@@ -77,8 +77,11 @@ def makeBatches(batch_index, batchSize):
 
 
 # TODO(guo li): please follow the implementation of load_highorder
-def load_degreetype(batch, X):
-  res = fx.getDegreeFeatures(batch)
+def load_degreetype(dataset, batch, X):
+  G = nx.read_weighted_edgelist(dataset, comments='#',\
+                                create_using=nx.DiGraph(),\
+                                encoding='utf-8')
+  res = fx.getDegreeFeatures(G, batch)
   # append features for every order, e.g 4, 5
   for ind in range(res):
     for i, row in enumerate(res[ind]):
@@ -86,8 +89,11 @@ def load_degreetype(batch, X):
 
 
 # TODO(leo): please follow the implementation of load_highorder
-def load_loworder(batch, X):
-  res = fx.getLowOrderFeatures(batch)
+def load_loworder(dataset, batch, X):
+  G = nx.read_weighted_edgelist(dataset, comments='#',\
+                                create_using=nx.DiGraph(),\
+                                encoding='utf-8')
+  res = fx.getLowOrderFeatures(G, batch)
   # append features for every order, e.g 4, 5
   for ind in range(res):
     for i, row in enumerate(res[ind]):

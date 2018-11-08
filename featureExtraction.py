@@ -208,8 +208,8 @@ def getLowOrderFeatures(graph, edges):
  
 ###########for test################
 if __name__ == "__main__":
-    #G = nx.read_weighted_edgelist("soc-sign-epinions.txt", comments='#', 
-    #                              create_using=nx.DiGraph(), encoding='utf-8')
+    G = nx.read_weighted_edgelist("soc-sign-epinions.txt", comments='#', 
+                                  create_using=nx.DiGraph(), encoding='utf-8')
     
     # print degreeFeature(G, list(G.edges(data='weight'))[1])
 
