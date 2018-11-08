@@ -2,6 +2,7 @@ import os
 import time
 import pickle
 import uuid
+import gc
 import numpy as np
 from scipy import sparse
 from collections import defaultdict
@@ -43,6 +44,7 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
     res[k].append(filename)
 
     if len(k_list) == 0:
+      gc.collect()
       return
   
   if prod is None:
@@ -50,11 +52,13 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
     pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
     pool.close()
     pool.terminate()
+    gc.collect()
   else:
     pool = ThreadPool(NUM_BRANCHING_THREADS)
     pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
     pool.close()
     pool.terminate()
+    gc.collect()
 
 def longWalkFeature(G, k_list, name):
   res = defaultdict(list)
