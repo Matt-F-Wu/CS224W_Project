@@ -16,6 +16,7 @@ import sys
 import getopt
 import random
 import time
+import math
 import networkx as nx
 import numpy as np
 from sklearn.linear_model import SGDClassifier
@@ -152,8 +153,8 @@ def loadFeaturesSmallerBatch(graph, dataset, batch):
 def loadFeatures(graph, dataset, batch):
   minibatches = []
   minibatchSize = len(batch) / NUM_THREADS
-  for i in xrange(NUM_THREADS):
-    minibatches.append(batch[i*minibatchSize:(i+1)*minibatchSize])
+  for i in xrange(int(math.ceil(float(len(batch))/minibatchSize))):
+    minibatches.append(batch[i*minibatchSize:min(len(batch), (i+1)*minibatchSize)])
 
   pool = ThreadPool(NUM_THREADS)
   results = pool.map(lambda mini: loadFeaturesSmallerBatch(graph, dataset, mini), minibatches)
