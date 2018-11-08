@@ -58,9 +58,13 @@ def loadGraph(dataset):
         comments='#',
         create_using=nx.DiGraph(),
         encoding='utf-8')
-  elif dataset == 'wikipedia':
+  elif dataset == 'wiki':
     # TODO: implement loading
-    pass
+    G = nx.read_weighted_edgelist(
+        'wiki.txt',
+        comments='#',
+        create_using=nx.DiGraph(),
+        encoding='utf-8')
   elif dataset == 'G3':
     G = getExampleGraph3()
 

@@ -22,6 +22,6 @@ G = nx.read_weighted_edgelist(
     create_using=nx.DiGraph(),
     encoding='utf-8')
 
-highorder.longWalkFeatureWriteAll(G, [4, 5], 'epinions')
+highorder.longWalkFeatureWriteAll(G, [4, 5], dataset)
 
 print '== Done =='
