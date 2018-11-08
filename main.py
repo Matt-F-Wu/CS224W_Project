@@ -115,7 +115,6 @@ def load_loworder(G, batch, X):
 # This function add features to X, it doesn't return anything
 def load_highorder(dataset, batch, X):
   global h_extractor
-
   res = h_extractor.getEdgeFeatures(batch)
   # append features for every order, e.g 4, 5
   for order in res:
@@ -142,12 +141,6 @@ def loadFeaturesSmallerBatch(graph, dataset, batch):
   if featureConfig['l']:
     load_loworder(graph, batch, X)
   
-  if featureConfig['h']:
-    load_highorder(dataset, batch, X)
-  
-  if featureConfig['n']:
-    load_node2vec(dataset, batch, X)
-
   return X
 
 def loadFeatures(graph, dataset, batch):
@@ -159,8 +152,18 @@ def loadFeatures(graph, dataset, batch):
   pool = ThreadPool(NUM_THREADS)
   results = pool.map(lambda mini: loadFeaturesSmallerBatch(graph, dataset, mini), minibatches)
 
-  return reduce(lambda x, y: x + y, results)
+  # 2D array of shape (b, f)
+  X = reduce(lambda x, y: x + y, results)
 
+  if featureConfig['h']:
+    # has internal multi-threading to deal with disk IO.
+    load_highorder(dataset, batch, X)
+  
+  if featureConfig['n']:
+    # in memory read operations, doesn't benefit from multi-threading.
+    load_node2vec(dataset, batch, X)
+
+  return X
 
 def loadLabel(graph, batch):
   y = []

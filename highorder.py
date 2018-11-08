@@ -152,12 +152,16 @@ class HighOrderFeatureExtractor(object):
     # 3. each element in that list is a feature vector for the
     #   corresponding edge for a specific order.
     edgeFeatures = {}
-    
+    pool = ThreadPool(NUM_BRANCHING_THREADS * 8)
     for order in feature_store:
       edgeFeatures[order] = np.zeros((len(i), 4**(order - 1)))
-      for idx, filename in enumerate(feature_store[order]):
+      # use multithreading to speed up loading
+      def featureAppend(arg):
+        idx, filename = arg
         edgeFeatures[order][:, idx] = readEntries(filename, i, j)
-    
+
+      pool.map(featureAppend, enumerate(feature_store[order]))
+    pool.close()
     # Row n of edgeFeature[order] represent a feature vector of that
     # order for the n-th edge in edges.
     return edgeFeatures
