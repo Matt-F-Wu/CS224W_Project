@@ -181,9 +181,6 @@ def train(dataset, iters, batchSize):
 
   # os.makedirs('result/{}'.format(dataset))
 
-  # logistic regression with l2 regularization
-  clf = SGDClassifier(loss='log', l1_ratio=0)
-
   # Use cross validation
   rocScoreOverall = 0.0
   accScoreOverall = 0.0
@@ -193,7 +190,8 @@ def train(dataset, iters, batchSize):
   #   -90% training
 
   for i, (train_index, test_index) in enumerate(kf.split(edges)):
-    
+    # logistic regression with l2 regularization
+    clf = SGDClassifier(loss='log', l1_ratio=0)
     for it in xrange(iters):
       # generate randomized training batches
       
