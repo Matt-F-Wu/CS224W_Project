@@ -27,7 +27,7 @@ class Graph():
 
 		sign = 1
 		while len(walk) < walk_length:
-			cur = walk[-1]
+			cur = abs(walk[-1])
 			cur_nbrs = sorted(G.neighbors(cur))
 			if len(cur_nbrs) > 0:
 				if len(walk) == 1:
@@ -38,7 +38,7 @@ class Graph():
 					walk.append(sign * next)
 				else:
 					# I can do BFS, DFS, or return to previous step.
-					prev = walk[-2]
+					prev = abs(walk[-2])
 					next = cur_nbrs[alias_edges[(prev, cur)].sample()]
 					sign = sign * G[cur][next]['weight']
 					walk.append(sign * next)
