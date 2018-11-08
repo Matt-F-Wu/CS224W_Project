@@ -36,6 +36,8 @@ featureConfig = {
   'e': False
 }
 
+configString = ''
+
 # a global highorder feature extractor
 h_extractor = None
 n_extractor = None
@@ -43,8 +45,8 @@ d_extractor = None
 
 
 def writeLog(dataset, logString):
-  with open('result/{}/performance.log'.format(
-      dataset), "a") as file:
+  with open('result/{}/performance_{}.log'.format(
+      dataset, configString), "a") as file:
     file.write(logString + '\n')
 
 
@@ -245,12 +247,16 @@ if __name__ == '__main__':
       batchSize = int(v)
     elif o == '-l':
       featureConfig['l'] = True
+      configString += 'l'
     elif o == '-h':
       featureConfig['h'] = True
+      configString += 'h'
     elif o == '-n':
       featureConfig['n'] = True
+      configString += 'n'
     elif o == '-e':
       featureConfig['e'] = True
+      configString += 'e'
     else:
       pass
 
