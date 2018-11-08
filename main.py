@@ -90,18 +90,16 @@ def makeBatches(batch_index, batchSize):
 def load_degreetype(G, batch, X):
   res = fx.getDegreeFeatures(G, batch)
   # append features for every order, e.g 4, 5
-  for ind in range(res):
-    for i, row in enumerate(res[ind]):
-      X[i].extend(row)
+  for i, row in enumerate(res):
+    X[i].extend(row)
 
 
 # TODO(leo): please follow the implementation of load_highorder
 def load_loworder(G, batch, X):
   res = fx.getLowOrderFeatures(G, batch)
   # append features for every order, e.g 4, 5
-  for ind in range(res):
-    for i, row in enumerate(res[ind]):
-      X[i].extend(row)
+  for i, row in enumerate(res):
+    X[i].extend(row)
 
 
 # This function add features to X, it doesn't return anything
