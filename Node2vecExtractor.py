@@ -4,7 +4,6 @@
 
 # Implementation note: the feature vector dictionary for all nodes are loaded
 # into this object in memory.
-import os
 import examples
 
 
@@ -14,7 +13,6 @@ class Node2vecExtractor(object):
 		self.dataset = dataset
 
 		# read file
-		os.mkdirs('emb/')
 		feat_table = {}
 		with open("emb/{}.emb".format(self.dataset), "r") as f:
 			for row in f:

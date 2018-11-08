@@ -16,6 +16,7 @@ import sys
 import getopt
 import random
 import time
+import networkx as nx
 import numpy as np
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_auc_score, accuracy_score
@@ -25,6 +26,15 @@ import highorder
 from Node2vecExtractor import Node2vecExtractor
 import featureExtraction as fx
 from examples import getExampleGraph3
+
+
+# This object configures which feature to use
+featureConfig = {
+  'l': False,
+  'h': False,
+  'n': False,
+  'e': False
+}
 
 # a global highorder feature extractor
 h_extractor = None
@@ -77,10 +87,7 @@ def makeBatches(batch_index, batchSize):
 
 
 # TODO(guo li): please follow the implementation of load_highorder
-def load_degreetype(dataset, batch, X):
-  G = nx.read_weighted_edgelist(dataset, comments='#',\
-                                create_using=nx.DiGraph(),\
-                                encoding='utf-8')
+def load_degreetype(G, batch, X):
   res = fx.getDegreeFeatures(G, batch)
   # append features for every order, e.g 4, 5
   for ind in range(res):
@@ -89,10 +96,7 @@ def load_degreetype(dataset, batch, X):
 
 
 # TODO(leo): please follow the implementation of load_highorder
-def load_loworder(dataset, batch, X):
-  G = nx.read_weighted_edgelist(dataset, comments='#',\
-                                create_using=nx.DiGraph(),\
-                                encoding='utf-8')
+def load_loworder(G, batch, X):
   res = fx.getLowOrderFeatures(G, batch)
   # append features for every order, e.g 4, 5
   for ind in range(res):
@@ -119,13 +123,22 @@ def load_node2vec(dataset, batch, X):
 
 # TODO: make this configurable so we can have different combinations
 # of features.
-def loadFeatures(dataset, batch):
+def loadFeatures(graph, dataset, batch):
+  global featureConfig
+
   batchSize = len(batch)
   X = [[] for i in xrange(batchSize)]
-  load_degreetype(batch, X)
-  load_loworder(batch, X)
-  load_highorder(dataset, batch, X)
-  load_node2vec(dataset, batch, X)
+  if featureConfig['e']:
+    load_degreetype(graph, batch, X)
+
+  if featureConfig['l']:
+    load_loworder(graph, batch, X)
+  
+  if featureConfig['h']:
+    load_highorder(dataset, batch, X)
+  
+  if featureConfig['n']:
+    load_node2vec(dataset, batch, X)
 
   return X
 
@@ -168,7 +181,7 @@ def train(dataset, iters, batchSize):
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
-        X = loadFeatures(dataset, batch)
+        X = loadFeatures(graph, dataset, batch)
 
         # load labels for this batch
         # y is numpy array, shape (n_samples,)
@@ -182,7 +195,7 @@ def train(dataset, iters, batchSize):
     for batch_i in validationBatches:
       batch = sampleBatch(edges, batch_i)
 
-      X = loadFeatures(dataset, batch)
+      X = loadFeatures(graph, dataset, batch)
 
       y = loadLabel(graph, batch)
 
@@ -213,7 +226,7 @@ def train(dataset, iters, batchSize):
 
 
 if __name__ == '__main__':
-  optval, leftover = getopt.getopt(sys.argv[1:], 'd:i:b:')
+  optval, leftover = getopt.getopt(sys.argv[1:], 'd:i:b:lhne')
   # default dataset is G3
   dataset = 'G3'
   # default iteration is 20
@@ -228,6 +241,14 @@ if __name__ == '__main__':
       iters = int(v)
     elif o == '-b':
       batchSize = int(v)
+    elif o == '-l':
+      featureConfig['l'] = True
+    elif o == '-h':
+      featureConfig['h'] = True
+    elif o == '-n':
+      featureConfig['n'] = True
+    elif o == '-e':
+      featureConfig['e'] = True
     else:
       pass
 
@@ -235,11 +256,9 @@ if __name__ == '__main__':
       dataset, iters)
 
   # create a global high order feature extractor for this dataset.
-  h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
-  n_extractor = Node2vecExtractor(dataset)
+  if featureConfig['h']:
+    h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
+  if featureConfig['n']:
+    n_extractor = Node2vecExtractor(dataset)
+  
   train(dataset, iters, batchSize)
-
-
-
-
-

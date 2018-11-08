@@ -1,8 +1,6 @@
-<<<<<<< Updated upstream
 obj/
+emb/
 *.pyc
 node2vec/src/*.pyc
 node2vec/emb/out.emd
-=======
 .DS_Store
->>>>>>> Stashed changes

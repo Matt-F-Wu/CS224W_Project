@@ -19,31 +19,31 @@ def degreeFeature(graph, srcNode, dstNode): # TUNGraphEdgeI
     #srcNode, dstNode, weight= edge
     weight = graph[srcNode][dstNode]['weight']
     featureList = []
-    print "Nodes read!: ", srcNode, dstNode, weight
+    # print "Nodes read!: ", srcNode, dstNode, weight
     
     # out degree for source node
     posOutDeg_src = graph.out_degree(srcNode, weight = 1)
     negOutDeg_src = graph.out_degree(srcNode, weight = -1)
     featureList.append(posOutDeg_src)
     featureList.append(negOutDeg_src)
-    print "Out degree for source node", posOutDeg_src, negOutDeg_src
+    # print "Out degree for source node", posOutDeg_src, negOutDeg_src
     
     # in degree for destination node
     posInDeg_dst = graph.out_degree(dstNode, weight = 1)
     negInDeg_dst = graph.out_degree(dstNode, weight = -1)
     featureList.append(posInDeg_dst)
     featureList.append(negInDeg_dst)
-    print "in degree for destination node", posInDeg_dst, negInDeg_dst
+    # print "in degree for destination node", posInDeg_dst, negInDeg_dst
     
     # total out degree for start node
     totalOut_src = posOutDeg_src + negOutDeg_src
     featureList.append(totalOut_src);
-    print "total out degree for start node", totalOut_src
+    # print "total out degree for start node", totalOut_src
     
     # total in degree for start node
     totalIn_dst = posInDeg_dst + negInDeg_dst
     featureList.append(totalIn_dst);
-    print "total in degree for start node", totalIn_dst
+    # print "total in degree for start node", totalIn_dst
     
     # change graph into undirected graph
     uGraph = graph.to_undirected()
@@ -52,7 +52,7 @@ def degreeFeature(graph, srcNode, dstNode): # TUNGraphEdgeI
     cmnNbrs = list(nx.common_neighbors(uGraph, srcNode, dstNode))
     cmnNbrNum = len(cmnNbrs)
     featureList.append(cmnNbrNum)
-    print "number of common neighbors", cmnNbrNum
+    # print "number of common neighbors", cmnNbrNum
     
     # neighbors(u) * neighbors(v)
     nbr_src = list(uGraph.neighbors(srcNode))
@@ -60,13 +60,13 @@ def degreeFeature(graph, srcNode, dstNode): # TUNGraphEdgeI
     nbr_srcNum = len(nbr_src)
     nbr_dstNum = len(nbr_dst)
     featureList.append(nbr_srcNum * nbr_dstNum)
-    print "neighbors(u) * neighbors(v)", nbr_srcNum * nbr_dstNum
+    # print "neighbors(u) * neighbors(v)", nbr_srcNum * nbr_dstNum
     
     # Jaccard Coefficient for given pair of nodes
     triple = nx.jaccard_coefficient(uGraph, [(srcNode, dstNode)])
     for u, v, jaccardCoef in triple:
         featureList.append(jaccardCoef)
-    print "Jaccard Coefficient for given pair of nodes", jaccardCoef
+    # print "Jaccard Coefficient for given pair of nodes", jaccardCoef
 
     return featureList
 
@@ -167,7 +167,7 @@ def getDegreeFeatures(graph, edges):
     for i in range(len(src)):
         feature = degreeFeature(graph, src[i], dst[i])
         edgeFeatures.append(feature)
-    print "degree level features: ", edgeFeatures
+    # print "degree level features: ", edgeFeatures
     return edgeFeatures
 
 
@@ -201,7 +201,7 @@ def getLowOrderFeatures(graph, edges):
     for i in range(len(src)):
         feature = lowOrderFeature(graph, src[i], dst[i])
         edgeFeatures.append(feature)
-    print "Motif counts: ", edgeFeatures
+    # print "Motif counts: ", edgeFeatures
     return edgeFeatures
         
 
