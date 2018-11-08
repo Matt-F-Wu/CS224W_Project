@@ -25,6 +25,7 @@ class Graph():
 
 		walk = [start_node]
 
+		sign = 1
 		while len(walk) < walk_length:
 			cur = walk[-1]
 			cur_nbrs = sorted(G.neighbors(cur))
@@ -32,12 +33,15 @@ class Graph():
 				if len(walk) == 1:
 					# I just started the walk, have no other way to go than to move 
 					# deeper, namely DFS.
-					walk.append(cur_nbrs[alias_nodes[cur].sample()])
+					next = cur_nbrs[alias_nodes[cur].sample()]
+					sign = sign * G[cur][next]['weight']
+					walk.append(sign * next)
 				else:
 					# I can do BFS, DFS, or return to previous step.
 					prev = walk[-2]
 					next = cur_nbrs[alias_edges[(prev, cur)].sample()]
-					walk.append(next)
+					sign = sign * G[cur][next]['weight']
+					walk.append(sign * next)
 			else:
 				break
 
@@ -58,7 +62,7 @@ class Graph():
 			random.shuffle(nodes)
 			# Each walk is independently parallalizable, thus I will distribute
 			# the workload to 4 threads to speed up performance.
-			results = pool.map(
+			pool.map(
 					lambda node: walks.append(self.node2vec_walk(
 							walk_length=walk_length, start_node=node)), nodes)
 
@@ -115,8 +119,7 @@ class Graph():
 			alias_nodes[node] = normalized_probs and Categorical(normalized_probs)
 
 		# spin up 4 threads
-		pool = ThreadPool(8)
-		pool.map(assign_probablistic_sampler_per_node, G.nodes())
+		map(assign_probablistic_sampler_per_node, G.nodes())
 
 		alias_edges = {}
 		triads = {}
@@ -125,13 +128,12 @@ class Graph():
 			def assign_sampler_per_edge_dir(edge):
 				alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
 			
-			pool.map(
-					assign_sampler_per_edge_dir, G.edges())
+			map(assign_sampler_per_edge_dir, G.edges())
 		else:
 			def assign_sampler_per_edge(edge):
 				alias_edges[edge] = self.get_alias_edge(edge[0], edge[1])
 				alias_edges[(edge[1], edge[0])] = self.get_alias_edge(edge[1], edge[0])
-			pool.map(assign_sampler_per_edge, G.edges())
+			map(assign_sampler_per_edge, G.edges())
 
 		self.alias_nodes = alias_nodes
 		self.alias_edges = alias_edges

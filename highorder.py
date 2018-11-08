@@ -167,12 +167,12 @@ class HighOrderFeatureExtractor(object):
 
 if __name__ == '__main__':  
   # Test computation and saving object
-  # G3 = examples.getExampleGraph3()
-  # start = time.time()
-  # longWalkFeatureWriteAll(G3, [4, 5], 'G3')
-  # end = time.time()
+  G3 = examples.getExampleGraph3()
+  start = time.time()
+  longWalkFeatureWriteAll(G3, [4, 5], 'G3')
+  end = time.time()
 
-  # print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
+  print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
   
   # Test loading object
   h_extractor = HighOrderFeatureExtractor('G3', [4, 5])
