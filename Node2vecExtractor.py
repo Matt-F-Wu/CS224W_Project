@@ -14,8 +14,12 @@ class Node2vecExtractor(object):
 
 		# read file
 		feat_table = {}
+		count = 0
 		with open("emb/{}.emb".format(self.dataset), "r") as f:
 			for row in f:
+				if count == 0:
+					count += 1
+					continue
 				row = row.strip().split()
 				node, feat = abs(int(float(row[0]))), row[1:]
 				for i in range(len(feat)):
@@ -23,15 +27,15 @@ class Node2vecExtractor(object):
 				if node not in feat_table:
 					feat_table[node] = feat
 				else:
-					for i in range(len(feat)):
+					for i in range(len(feat_table[node])):
 						feat_table[node][i] = (feat_table[node][i] + feat[i]) / 2.0
 			
 		self.feat_table = feat_table
 
-	def getFeatureForEdge(src, dst):
+	def getFeatureForEdge(self, src, dst):
 		return self.feat_table[src] + self.feat_table[dst]
 
 
 if __name__ == '__main__':
 	n_extractor = Node2vecExtractor('epinions')
-	n_extractor.getFeatureForEdge(0, 1)
+	# n_extractor.getFeatureForEdge(0, 1)
