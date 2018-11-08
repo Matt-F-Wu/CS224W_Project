@@ -130,7 +130,7 @@ def load_node2vec(dataset, batch, X):
 
 # TODO: make this configurable so we can have different combinations
 # of features.
-def loadFeaturesSmallerBatch(graph, dataset, minibatch):
+def loadFeaturesSmallerBatch(graph, dataset, batch):
   global featureConfig
 
   batchSize = len(batch)
