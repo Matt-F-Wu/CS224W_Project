@@ -170,6 +170,7 @@ def loadLabel(graph, batch):
 
 
 def train(dataset, iters, batchSize):
+  global ld_extractor
   # load the graph and get all the edges as an numpy array
   graph, edges = loadGraph(dataset)
 
