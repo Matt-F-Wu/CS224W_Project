@@ -49,19 +49,12 @@ def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
     pool = ThreadPool(NUM_BRANCHING_THREADS)
     pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
     pool.close()
+    pool.terminate()
   else:
-    if k > 3:
-      # stop making more threads
-      adjacencyMatrixBranchMultiply(prod.dot(G.APos), G, k + 1, k_list, res, name)
-      adjacencyMatrixBranchMultiply(
-          prod.dot(G.APosT), G, k + 1, k_list, res, name)
-      adjacencyMatrixBranchMultiply(prod.dot(G.ANeg), G, k + 1, k_list, res, name)
-      adjacencyMatrixBranchMultiply(
-          prod.dot(G.ANegT), G, k + 1, k_list, res, name)
-    else:
-      pool = ThreadPool(NUM_BRANCHING_THREADS)
-      pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
-      pool.close()
+    pool = ThreadPool(NUM_BRANCHING_THREADS)
+    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
+    pool.close()
+    pool.terminate()
 
 def longWalkFeature(G, k_list, name):
   res = defaultdict(list)
@@ -167,12 +160,12 @@ class HighOrderFeatureExtractor(object):
 
 if __name__ == '__main__':  
   # Test computation and saving object
-  # G3 = examples.getExampleGraph3()
-  # start = time.time()
-  # longWalkFeatureWriteAll(G3, [4, 5], 'G3')
-  # end = time.time()
+  G3 = examples.getExampleGraph3()
+  start = time.time()
+  longWalkFeatureWriteAll(G3, [4, 5], 'G3')
+  end = time.time()
 
-  # print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
+  print 'Runtime: {:.2f} minutes'.format((end - start) / 60)
   
   # Test loading object
   h_extractor = HighOrderFeatureExtractor('G3', [4, 5])
