@@ -177,7 +177,8 @@ def train(dataset, iters, batchSize):
   if featureConfig['l'] or featureConfig['e']:
     ld_extractor = LoDegFeatureExtractor(graph)
 
-  os.makedirs('result/{}'.format(dataset))
+  # os.makedirs('result/{}'.format(dataset))
+
   # logistic regression with l2 regularization
   clf = SGDClassifier(loss='log', l1_ratio=0)
 
@@ -197,9 +198,10 @@ def train(dataset, iters, batchSize):
       trainBatches = makeBatches(train_index, batchSize)
       validationBatches = makeBatches(test_index, batchSize)
 
-      for batch_i in trainBatches:
+      for k_idx, batch_i in enumerate(trainBatches):
         # sample a mini-batch of size batchSize
         # the batch is a list of edges.
+        print k_idx
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
@@ -286,6 +288,6 @@ if __name__ == '__main__':
     h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
   if featureConfig['n']:
     n_extractor = Node2vecExtractor(dataset)
-
+    print 'built n extractor'
   
   train(dataset, iters, batchSize)

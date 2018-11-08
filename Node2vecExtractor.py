@@ -33,7 +33,7 @@ class Node2vecExtractor(object):
 		self.feat_table = feat_table
 
 	def getFeatureForEdge(self, src, dst):
-		return self.feat_table[src] + self.feat_table[dst]
+		return self.feat_table[int(src)] + self.feat_table[int(dst)]
 
 
 if __name__ == '__main__':
