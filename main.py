@@ -22,11 +22,13 @@ from sklearn.metrics import roc_auc_score, accuracy_score
 from sklearn.model_selection import KFold
 
 import highorder
+from Node2vecExtractor import Node2vecExtractor
 import featureExtraction as fx
 from examples import getExampleGraph3
 
 # a global highorder feature extractor
 h_extractor = None
+n_extractor = None
 d_extractor = None
 
 
@@ -103,6 +105,12 @@ def load_highorder(dataset, batch, X):
       X[i].extend(row)
 
 
+def load_node2vec(dataset, batch, X):
+  global n_extractor
+  for i, edge in enumerate(batch):
+    X[i].extend(n_extractor.getFeatureForEdge(edge[0], edge[1]))
+  
+
 # TODO: make this configurable so we can have different combinations
 # of features.
 def loadFeatures(dataset, batch):
@@ -111,6 +119,7 @@ def loadFeatures(dataset, batch):
   load_degreetype(batch, X)
   load_loworder(batch, X)
   load_highorder(dataset, batch, X)
+  load_node2vec(dataset, batch, X)
 
   return X
 
@@ -221,6 +230,7 @@ if __name__ == '__main__':
 
   # create a global high order feature extractor for this dataset.
   h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
+  n_extractor = Node2vecExtractor(dataset)
   train(dataset, iters, batchSize)
 
 
