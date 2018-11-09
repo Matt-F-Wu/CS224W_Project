@@ -162,6 +162,7 @@ class HighOrderFeatureExtractor(object):
 
       pool.map(featureAppend, enumerate(feature_store[order]))
     pool.close()
+    pool.terminate()
     # Row n of edgeFeature[order] represent a feature vector of that
     # order for the n-th edge in edges.
     return edgeFeatures

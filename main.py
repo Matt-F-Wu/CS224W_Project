@@ -151,6 +151,8 @@ def loadFeatures(graph, dataset, batch):
 
   pool = ThreadPool(NUM_THREADS)
   results = pool.map(lambda mini: loadFeaturesSmallerBatch(graph, dataset, mini), minibatches)
+  pool.close()
+  pool.terminate()
 
   # 2D array of shape (b, f)
   X = reduce(lambda x, y: x + y, results)
