@@ -33,7 +33,6 @@ class Node2vecExtractor(object):
 		self.feat_table = feat_table
 
 	def getFeatureForEdge(self, src, dst):
-		sum = 0.0
 		# this is essentially the dot product of the 2 embeddings.
 		return sum(map(lambda (a, b): a * b, zip(self.feat_table[int(src)], self.feat_table[int(dst)])))
 
