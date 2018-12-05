@@ -57,11 +57,18 @@ def adjacencyMatrixBranchMultiply(prod, G, k, res, name,
   if k > 2:
     # We could utilize the A^2 matrices already stored
     filenames = load_obj('{}/hf_A2'.format(name))
-    for filename in filenames:
-      mtx = load_npz(filename)
-      if prod is None:
-        adjacencyMatrixBranchMultiply(mtx, G, k - 2, res, name)
-      else:
+    if prod is None:
+      # At the beginning of chained multiplication, create threads.
+      pool = ThreadPool(NUM_BRANCHING_THREADS)
+      def branching(filename):
+        mtx = load_npz(filename)
+        return adjacencyMatrixBranchMultiply(mtx, G, k - 2, res, name)
+      pool.map(branching, filenames)
+      pool.close()
+      pool.terminate()
+    else:
+      for filename in filenames:
+        mtx = load_npz(filename)
         adjacencyMatrixBranchMultiply(
             prod.dot(mtx), G, k - 2, res, name)
   elif k == 2:
