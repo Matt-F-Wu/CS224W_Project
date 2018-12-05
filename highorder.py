@@ -34,47 +34,79 @@ def load_npz(name):
   return sparse.load_npz('obj/' + name + '.npz')
 
 # Expect G to be of type SignedDirectedGraph
-def adjacencyMatrixBranchMultiply(prod, G, k, k_list, res, name):
-  if k in k_list:
-    k_list = [i for i in k_list if i != k]
-    # To not use too much memory, I have to save this sparse matrix
-    # on the file system, and record the name of the file as a handle.
+def adjacencyMatrixBranchMultiply(prod, G, k, res, name,
+    precompute=False):
+  if precompute:
+    # A^2(s) have not been precomputed.
+    if k < 2:
+      # Write result to file, and add file name to res.
+      filename = '{}/{}'.format(name, uuid.uuid4())
+      save_npz(prod, filename)
+      res.append(filename)
+      return
+
+    for mtx in G.adjPermutations():
+      if prod is None:
+        adjacencyMatrixBranchMultiply(
+            mtx, G, k - 1, res, name, precompute)
+      else:
+        adjacencyMatrixBranchMultiply(
+            prod.dot(mtx), G, k - 1, res, name, precompute)
+    return
+
+  if k > 2:
+    # We could utilize the A^2 matrices already stored
+    filenames = load_obj('{}/hf_A2'.format(name))
+    for filename in filenames:
+      mtx = load_npz(filename)
+      if prod is None:
+        adjacencyMatrixBranchMultiply(mtx, G, k - 2, res, name)
+      else:
+        adjacencyMatrixBranchMultiply(
+            prod.dot(mtx), G, k - 2, res, name)
+  elif k == 2:
+    # Multiply with A
+    for mtx in G.adjPermutations():
+      if prod is None:
+        adjacencyMatrixBranchMultiply(mtx, G, k - 1, res, name)
+      else:
+        adjacencyMatrixBranchMultiply(
+            prod.dot(mtx), G, k - 1, res, name)
+  else:
+    # Write result to file, and add file name to res.
     filename = '{}/{}'.format(name, uuid.uuid4())
     save_npz(prod, filename)
-    res[k].append(filename)
-
-    if len(k_list) == 0:
-      gc.collect()
-      return
+    res.append(filename)
   
-  if prod is None:
-    pool = ThreadPool(NUM_BRANCHING_THREADS)
-    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(mtx, G, k + 1, k_list, res, name), G.adjPermutations())
-    pool.close()
-    pool.terminate()
-    gc.collect()
-  else:
-    pool = ThreadPool(NUM_BRANCHING_THREADS)
-    pool.map(lambda mtx: adjacencyMatrixBranchMultiply(prod.dot(mtx), G, k + 1, k_list, res, name), G.adjPermutations())
-    pool.close()
-    pool.terminate()
-    gc.collect()
+  return
 
-def longWalkFeature(G, k_list, name):
-  res = defaultdict(list)
-  adjacencyMatrixBranchMultiply(None, G, 1, k_list, res, name)
+def longWalkFeature(G, k_list, name, precompute=False):
+  resAll = defaultdict(list)
+  
+  for k in k_list:
+    res = []
+    adjacencyMatrixBranchMultiply(None, G, k, res, name, precompute)
+    resAll[k] = res
 
-  return res
+  return resAll
 
 def longWalkFeatureWriteAll(G, k_list, name):
   # create a subdirectory under obj to store all data relevant to this
   # graph.
   os.mkdir('obj/{}'.format(name))
-  
   G = SignedDirectedGraph(G)
+  save_obj(G.node_index, '{}/node_index'.format(name))
+  
+  # Preprocessing step:
+  # Store all the A^2 results, these results will be used to
+  # consititute higher powers to eliminate duplicate computation.
+  A2res = longWalkFeature(G, [3], name, precompute=True)
+  # Path of length 3 computes A^2.
+  save_obj(A2res[3], '{}/hf_A2'.format(name))
+
+  # Actually computing the targeted lengths.
   res = longWalkFeature(G, k_list, name)
   
-  save_obj(G.node_index, '{}/node_index'.format(name))
   for k in k_list:
     save_obj(res[k], '{}/hf_{}'.format(name, k))
 
