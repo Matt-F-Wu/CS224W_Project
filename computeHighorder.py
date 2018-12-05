@@ -13,7 +13,8 @@ for o, v in optval:
 
 filenameMap = {
   'epinions': "soc-sign-epinions.txt",
-  'wiki': 'wiki.txt'
+  'wiki': 'wiki.txt',
+  'slashdot': 'soc-sign-Slashdot081106.txt'
 }
 
 G = nx.read_weighted_edgelist(
