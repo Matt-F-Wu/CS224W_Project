@@ -179,6 +179,10 @@ def train(dataset, iters, batchSize):
   global ld_extractor
   # load the graph and get all the edges as an numpy array
   graph, edges = loadGraph(dataset)
+  
+  # hold out a test dataset
+  #testEdges = np.random.choice(edges, len(edges) / 1, replace = False)
+  #trainEdges = [x for x in edges if x not in testEdges]
 
   # build extractor only once.
   if featureConfig['l'] or featureConfig['e']:
@@ -264,22 +268,22 @@ if __name__ == '__main__':
   batchSize = 64
 
   for o, v in optval:
-    if o == '-d':
+    if o == '-d': # dataset
       dataset = v
-    elif o == '-i':
+    elif o == '-i': # iteration
       iters = int(v)
-    elif o == '-b':
+    elif o == '-b': # batches
       batchSize = int(v)
-    elif o == '-l':
+    elif o == '-l': # low
       featureConfig['l'] = True
       configString += 'l'
-    elif o == '-h':
+    elif o == '-h': # high
       featureConfig['h'] = True
       configString += 'h'
-    elif o == '-n':
+    elif o == '-n': # N2V
       featureConfig['n'] = True
       configString += 'n'
-    elif o == '-e':
+    elif o == '-e': # degree
       featureConfig['e'] = True
       configString += 'e'
     else:
