@@ -5,12 +5,13 @@
 # Implementation note: the feature vector dictionary for all nodes are loaded
 # into this object in memory.
 import examples
-
+import numpy as np
 
 class Node2vecExtractor(object):
-	def __init__(self, dataset):
+	def __init__(self, dataset, flag):
 		super(Node2vecExtractor, self).__init__()
 		self.dataset = dataset
+		self.flag = flag
 
 		# read file
 		feat_table = {}
@@ -33,10 +34,42 @@ class Node2vecExtractor(object):
 		self.feat_table = feat_table
 
 	def getFeatureForEdge(self, src, dst):
-		# this is essentially the dot product of the 2 embeddings.
-		return [sum(map(lambda (a, b): a * b, zip(self.feat_table[int(src)], self.feat_table[int(dst)])))]
+		# print "get ff yl"
+		if self.flag == "dot":
+			# this is essentially the dot product of the 2 embeddings.
+			
+			# print "feat_table: ", len(self.feat_table[int(src)])
+			# dotprod_feat = [sum(map(lambda (a, b): a * b, zip(self.feat_table[int(src)], self.feat_table[int(dst)])))]
+			dotprod_feat = [np.dot(self.feat_table[int(src)],self.feat_table[int(dst)])]
+			# print "hadamard: ", dotprod_feat
+			return dotprod_feat
+		elif self.flag == "concat":
+			concat_feat = self.feat_table[int(src)] + self.feat_table[int(dst)]
+			# print "concat: ", len(concat_feat)
+			return concat_feat
+		elif self.flag == "sum":
+			sum_feat = np.array(self.feat_table[int(src)]) + np.array(self.feat_table[int(dst)])
+			sum_feat = list(sum_feat)
+			# print "sum: ", len(sum_feat)
+			return sum_feat
+		elif self.flag == "avg":
+			avg_feat = np.array(self.feat_table[int(src)]) + np.array(self.feat_table[int(dst)])/2.0
+			avg_feat = list(avg_feat)
+			# print "avg: ", len(avg_feat)
+			return avg_feat
+		elif self.flag == "dis":
+			dis_feat = [np.linalg.norm(np.array(self.feat_table[int(src)]) - np.array(self.feat_table[int(dst)]))]
+			# print "dis: ", dis_feat
+			return dis_feat
+
 
 
 if __name__ == '__main__':
+	# print "here yl"
 	n_extractor = Node2vecExtractor('epinions')
-	# n_extractor.getFeatureForEdge(0, 1)
+	# n_extractor.getFeatureForEdge(0, 1, "hadamard")
+	# n_extractor.getFeatureForEdge(0, 1, "concat")
+	# n_extractor.getFeatureForEdge(0, 1, "sum")
+	# n_extractor.getFeatureForEdge(0, 1, "avg")
+	# n_extractor.getFeatureForEdge(0, 1, "distance")
+	# print "finish"

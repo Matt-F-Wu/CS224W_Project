@@ -259,13 +259,15 @@ def train(dataset, iters, batchSize):
 
 
 if __name__ == '__main__':
-  optval, leftover = getopt.getopt(sys.argv[1:], 'd:i:b:lhne')
+  optval, leftover = getopt.getopt(sys.argv[1:], 'd:i:b:lhn:e')
   # default dataset is G3
   dataset = 'G3'
   # default iteration is 20
   iters = 20
   # default batch size is 64
   batchSize = 64
+
+  print "optval: ", optval
 
   for o, v in optval:
     if o == '-d': # dataset
@@ -283,7 +285,8 @@ if __name__ == '__main__':
     elif o == '-n': # N2V
       featureConfig['n'] = True
       configString += 'n'
-    elif o == '-e': # degree
+      n2v_flag = v
+    elif o == '-e':
       featureConfig['e'] = True
       configString += 'e'
     else:
@@ -296,7 +299,7 @@ if __name__ == '__main__':
   if featureConfig['h']:
     h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
   if featureConfig['n']:
-    n_extractor = Node2vecExtractor(dataset)
+    n_extractor = Node2vecExtractor(dataset, n2v_flag)
     print 'built n extractor'
   
   train(dataset, iters, batchSize)
