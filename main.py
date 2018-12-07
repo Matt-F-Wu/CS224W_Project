@@ -185,6 +185,10 @@ def train(dataset, iters, batchSize):
   global ld_extractor
   # load the graph and get all the edges as an numpy array
   graph, edges = loadGraph(dataset)
+  
+  # hold out a test dataset
+  #testEdges = np.random.choice(edges, len(edges) / 1, replace = False)
+  #trainEdges = [x for x in edges if x not in testEdges]
 
   # build extractor only once.
   if featureConfig['l'] or featureConfig['e']:
@@ -208,11 +212,11 @@ def train(dataset, iters, batchSize):
       
       trainBatches = makeBatches(train_index, batchSize)
       validationBatches = makeBatches(test_index, batchSize)
-
+      print i
       for k_idx, batch_i in enumerate(trainBatches):
         # sample a mini-batch of size batchSize
         # the batch is a list of edges.
-        print k_idx
+        # print k_idx
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
@@ -261,7 +265,7 @@ def train(dataset, iters, batchSize):
 
 
 if __name__ == '__main__':
-  optval, leftover = getopt.getopt(sys.argv[1:], 'd:i:b:lhne')
+  optval, leftover = getopt.getopt(sys.argv[1:], 'd:i:b:lhn:e')
   # default dataset is G3
   dataset = 'G3'
   # default iteration is 20
@@ -269,22 +273,25 @@ if __name__ == '__main__':
   # default batch size is 64
   batchSize = 64
 
+  print "optval: ", optval
+
   for o, v in optval:
-    if o == '-d':
+    if o == '-d': # dataset
       dataset = v
-    elif o == '-i':
+    elif o == '-i': # iteration
       iters = int(v)
-    elif o == '-b':
+    elif o == '-b': # batches
       batchSize = int(v)
-    elif o == '-l':
+    elif o == '-l': # low
       featureConfig['l'] = True
       configString += 'l'
-    elif o == '-h':
+    elif o == '-h': # high
       featureConfig['h'] = True
       configString += 'h'
-    elif o == '-n':
+    elif o == '-n': # N2V
       featureConfig['n'] = True
       configString += 'n'
+      n2v_flag = v
     elif o == '-e':
       featureConfig['e'] = True
       configString += 'e'
@@ -298,7 +305,7 @@ if __name__ == '__main__':
   if featureConfig['h']:
     h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
   if featureConfig['n']:
-    n_extractor = Node2vecExtractor(dataset)
+    n_extractor = Node2vecExtractor(dataset, n2v_flag)
     print 'built n extractor'
   
   train(dataset, iters, batchSize)
