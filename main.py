@@ -64,7 +64,7 @@ def loadGraph(dataset):
         comments='#',
         create_using=nx.DiGraph(),
         encoding='utf-8')
-  elif dataset == 'wiki':
+  elif dataset[:4] == 'wiki':
     # TODO: implement loading
     G = nx.read_weighted_edgelist(
         'wiki.txt',
@@ -132,7 +132,7 @@ def load_node2vec(dataset, batch, X):
   global n_extractor
   for i, edge in enumerate(batch):
     X[i].extend(n_extractor.getFeatureForEdge(edge[0], edge[1]))
-  
+  # print "load_node2vec X: ", X 
 
 # TODO: make this configurable so we can have different combinations
 # of features.
@@ -184,6 +184,7 @@ def loadLabel(graph, batch):
 def train(dataset, iters, batchSize):
   global ld_extractor
   # load the graph and get all the edges as an numpy array
+  # print "dataset: ", dataset
   graph, edges = loadGraph(dataset)
   
   # hold out a test dataset
@@ -226,6 +227,8 @@ def train(dataset, iters, batchSize):
         # y is numpy array, shape (n_samples,)
         y = loadLabel(graph, batch)
 
+        # print "X: ", X
+        # print "y: ", y
         clf.partial_fit(X, y, classes=[-1, 1])
 
     # time to varify our performance

@@ -77,14 +77,14 @@ class Node2vecExtractor(object):
 			dis_feat = [np.linalg.norm(np.array(self.feat_table[int(src)]) - np.array(self.feat_table[int(dst)]))]
 			# print "dis: ", dis_feat
 			feat += dis_feat
-
+		# print "node2vec feat: ", feat
 		return feat
 
 
 if __name__ == '__main__':
 	# print "here yl"
-	n_extractor = Node2vecExtractor('epinions',"hada")
-	n_extractor.getFeatureForEdge(0, 1)
+	n_extractor = Node2vecExtractor('wiki_lowq',"hada")
+	n_extractor.getFeatureForEdge(2, 1)
 	# n_extractor.getFeatureForEdge(0, 1, "concat")
 	# n_extractor.getFeatureForEdge(0, 1, "sum")
 	# n_extractor.getFeatureForEdge(0, 1, "avg")
