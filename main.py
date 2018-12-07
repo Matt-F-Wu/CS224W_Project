@@ -71,6 +71,12 @@ def loadGraph(dataset):
         comments='#',
         create_using=nx.DiGraph(),
         encoding='utf-8')
+  elif dataset == 'slashdot':
+    G = nx.read_weighted_edgelist(
+        'soc-sign-Slashdot081106.txt',
+        comments='#',
+        create_using=nx.DiGraph(),
+        encoding='utf-8')
   elif dataset == 'G3':
     G = getExampleGraph3()
 
