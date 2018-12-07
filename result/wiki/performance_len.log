@@ -25,3 +25,18 @@ For validation fold #7:
 For validation fold #8:
  roc is 0.5
  accuracy is 0.20192691496
+For validation fold #0:
+ roc is 0.544943691709
+ accuracy is 0.797446646341
+For validation fold #1:
+ roc is 0.505009722591
+ accuracy is 0.780583079268
+For validation fold #2:
+ roc is 0.536936324757
+ accuracy is 0.798304115854
+For validation fold #3:
+ roc is 0.511267306584
+ accuracy is 0.785823170732
+For validation fold #0:
+ roc is 0.532898668521
+ accuracy is 0.79296875

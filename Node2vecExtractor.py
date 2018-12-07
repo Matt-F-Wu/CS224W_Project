@@ -35,39 +35,55 @@ class Node2vecExtractor(object):
 
 	def getFeatureForEdge(self, src, dst):
 		# print "get ff yl"
-		if self.flag == "dot":
+		feat = []
+		flag = self.flag.split("-")
+		if "dot" in flag:
 			# this is essentially the dot product of the 2 embeddings.
 			
 			# print "feat_table: ", len(self.feat_table[int(src)])
 			# dotprod_feat = [sum(map(lambda (a, b): a * b, zip(self.feat_table[int(src)], self.feat_table[int(dst)])))]
 			dotprod_feat = [np.dot(self.feat_table[int(src)],self.feat_table[int(dst)])]
 			# print "hadamard: ", dotprod_feat
-			return dotprod_feat
-		elif self.flag == "concat":
+			feat += dotprod_feat
+		
+		if "hada" in flag:
+			# print self.feat_table[int(src)]
+			# print self.feat_table[int(dst)]
+			hada_feat = np.prod([self.feat_table[int(src)],self.feat_table[int(dst)]], axis=0)
+			hada_feat = list(hada_feat)
+			# print hada_feat
+			# print "hada_feat: ", len(hada_feat)
+			feat += hada_feat
+
+		if "concat" in flag:
 			concat_feat = self.feat_table[int(src)] + self.feat_table[int(dst)]
 			# print "concat: ", len(concat_feat)
-			return concat_feat
-		elif self.flag == "sum":
+			feat += concat_feat
+		
+		if "sum" in flag:
 			sum_feat = np.array(self.feat_table[int(src)]) + np.array(self.feat_table[int(dst)])
 			sum_feat = list(sum_feat)
 			# print "sum: ", len(sum_feat)
-			return sum_feat
-		elif self.flag == "avg":
+			feat += sum_feat
+		
+		if "avg" in flag:
 			avg_feat = np.array(self.feat_table[int(src)]) + np.array(self.feat_table[int(dst)])/2.0
 			avg_feat = list(avg_feat)
 			# print "avg: ", len(avg_feat)
-			return avg_feat
-		elif self.flag == "dis":
+			feat += avg_feat
+		
+		if "dis" in flag:
 			dis_feat = [np.linalg.norm(np.array(self.feat_table[int(src)]) - np.array(self.feat_table[int(dst)]))]
 			# print "dis: ", dis_feat
-			return dis_feat
+			feat += dis_feat
 
+		return feat
 
 
 if __name__ == '__main__':
 	# print "here yl"
-	n_extractor = Node2vecExtractor('epinions')
-	# n_extractor.getFeatureForEdge(0, 1, "hadamard")
+	n_extractor = Node2vecExtractor('epinions',"hada")
+	n_extractor.getFeatureForEdge(0, 1)
 	# n_extractor.getFeatureForEdge(0, 1, "concat")
 	# n_extractor.getFeatureForEdge(0, 1, "sum")
 	# n_extractor.getFeatureForEdge(0, 1, "avg")
