@@ -16,6 +16,7 @@ class Node2vecExtractor(object):
 		# read file
 		feat_table = {}
 		count = 0
+		print self.dataset
 		with open("emb/{}.emb".format(self.dataset), "r") as f:
 			for row in f:
 				if count == 0:
