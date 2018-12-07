@@ -1,4 +1,5 @@
 obj/
+emb/
 *.pyc
 node2vec/src/*.pyc
 node2vec/emb/out.emd
