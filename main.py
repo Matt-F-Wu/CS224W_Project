@@ -213,7 +213,7 @@ def train(dataset, iters, batchSize):
       for k_idx, batch_i in enumerate(trainBatches):
         # sample a mini-batch of size batchSize
         # the batch is a list of edges.
-        # print k_idx
+        # print k_idx 
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
