@@ -19,7 +19,7 @@ import time
 import math
 import networkx as nx
 import numpy as np
-from sklearn.linear_model import SGDClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import roc_auc_score, accuracy_score
 from sklearn.model_selection import KFold
 from multiprocessing.dummy import Pool as ThreadPool
@@ -203,7 +203,7 @@ def train(dataset, iters, batchSize):
 
   for i, (train_index, test_index) in enumerate(kf.split(edges)):
     # logistic regression with l2 regularization
-    clf = SGDClassifier(loss='log', l1_ratio=0)
+    clf = MLPClassifier(hidden_layer_sizes=(64, 32, 32))
     for it in xrange(iters):
       # generate randomized training batches
       

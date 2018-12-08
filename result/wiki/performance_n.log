@@ -29,3 +29,6 @@ For validation fold #9:
  roc is 0.5
  accuracy is 0.781392536489
 Overall, roc is: 0.5, accuracy is 0.784152868134
+For validation fold #0:
+ roc is 0.563985725415
+ accuracy is 0.803639481707
