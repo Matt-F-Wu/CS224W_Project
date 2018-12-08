@@ -32,3 +32,34 @@ Overall, roc is: 0.5, accuracy is 0.784152868134
 For validation fold #0:
  roc is 0.563985725415
  accuracy is 0.803639481707
+For validation fold #0:
+ roc is 0.545561619608
+ accuracy is 0.794122869318
+For validation fold #1:
+ roc is 0.540301711312
+ accuracy is 0.794921875
+For validation fold #2:
+ roc is 0.530682257932
+ accuracy is 0.795010653409
+For validation fold #3:
+ roc is 0.532644914627
+ accuracy is 0.797496448864
+For validation fold #4:
+ roc is 0.536279410477
+ accuracy is 0.788529829545
+For validation fold #5:
+ roc is 0.546589952153
+ accuracy is 0.793561538117
+For validation fold #6:
+ roc is 0.534587618769
+ accuracy is 0.796696045097
+For validation fold #7:
+ roc is 0.553790809524
+ accuracy is 0.800358329232
+For validation fold #8:
+ roc is 0.550454917283
+ accuracy is 0.798805056594
+For validation fold #9:
+ roc is 0.533889512589
+ accuracy is 0.78676404796
+Overall, roc is: 0.540478272427, accuracy is 0.794626669314
