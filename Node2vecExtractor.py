@@ -10,8 +10,8 @@ import numpy as np
 class Node2vecExtractor(object):
 	def __init__(self, dataset, flag):
 		super(Node2vecExtractor, self).__init__()
-		self.dataset = dataset
-		self.flag = flag
+		
+		self.dataset, self.flag = flag.split(":")
 
 		# read file
 		feat_table = {}

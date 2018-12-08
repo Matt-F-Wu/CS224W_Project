@@ -64,7 +64,7 @@ def loadGraph(dataset):
         comments='#',
         create_using=nx.DiGraph(),
         encoding='utf-8')
-  elif dataset[:4] == 'wiki':
+  elif dataset == 'wiki':
     # TODO: implement loading
     G = nx.read_weighted_edgelist(
         'wiki.txt',
