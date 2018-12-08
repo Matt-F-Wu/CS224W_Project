@@ -186,10 +186,6 @@ def train(dataset, iters, batchSize):
   # load the graph and get all the edges as an numpy array
   # print "dataset: ", dataset
   graph, edges = loadGraph(dataset)
-  
-  # hold out a test dataset
-  #testEdges = np.random.choice(edges, len(edges) / 1, replace = False)
-  #trainEdges = [x for x in edges if x not in testEdges]
 
   # build extractor only once.
   if featureConfig['l'] or featureConfig['e']:
@@ -217,7 +213,7 @@ def train(dataset, iters, batchSize):
       for k_idx, batch_i in enumerate(trainBatches):
         # sample a mini-batch of size batchSize
         # the batch is a list of edges.
-        # print k_idx
+        print k_idx
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
@@ -306,9 +302,9 @@ if __name__ == '__main__':
 
   # create a global high order feature extractor for this dataset.
   if featureConfig['h']:
-    h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
+      h_extractor = highorder.HighOrderFeatureExtractor(dataset, [4, 5])
   if featureConfig['n']:
-    n_extractor = Node2vecExtractor(dataset, n2v_flag)
-    print 'built n extractor'
+      n_extractor = Node2vecExtractor(dataset, n2v_flag)
+      print 'built n extractor'
   
   train(dataset, iters, batchSize)
