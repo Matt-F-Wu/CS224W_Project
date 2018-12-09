@@ -215,6 +215,7 @@ def train(dataset, iters, batchSize):
         # the batch is a list of edges.
         print 'batch #: ', k_idx
         start = time.time()
+
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
