@@ -206,14 +206,15 @@ def train(dataset, iters, batchSize):
     clf = MLPClassifier(hidden_layer_sizes=(64, 32, 32))
     for it in xrange(iters):
       # generate randomized training batches
-      
+      start_iter = time.time()
       trainBatches = makeBatches(train_index, batchSize)
       validationBatches = makeBatches(test_index, batchSize)
-      print i
+      print 'iteration:', i, ' - # batches:', len(trainBatches)
       for k_idx, batch_i in enumerate(trainBatches):
         # sample a mini-batch of size batchSize
         # the batch is a list of edges.
-        # print k_idx 
+        print 'batch #: ', k_idx
+        start = time.time()
         batch = sampleBatch(edges, batch_i)
 
         # load features to X of shape (batchSize, f)
@@ -226,6 +227,11 @@ def train(dataset, iters, batchSize):
         # print "X: ", X
         # print "y: ", y
         clf.partial_fit(X, y, classes=[-1, 1])
+        end = time.time()
+        print 'batch time: ', (end - start) / 60.0
+      
+      end_iter = time.time()
+      print 'iter time: ', (end_iter - start_iter) / 60.0
 
     # time to varify our performance
     rocScore = 0.0

@@ -191,7 +191,7 @@ class HighOrderFeatureExtractor(object):
     # 3. each element in that list is a feature vector for the
     #   corresponding edge for a specific order.
     edgeFeatures = {}
-    pool = ThreadPool(NUM_BRANCHING_THREADS * 8)
+    pool = ThreadPool(32)
     for order in feature_store:
       edgeFeatures[order] = np.zeros((len(i), 4**(order - 1)))
       # use multithreading to speed up loading
